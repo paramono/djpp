@@ -91,54 +91,54 @@ class WebhookEvent(PaypalModel):
         ret.create_or_update_resource()
         if created:
             ret.send_signal()
-            return ret
+        return ret
 
-        @property
-        def resource_model(self):
-            resource_type = self.resource_type.lower()
-            if resource_type == "agreement":
-                from .billing import BillingAgreement
-                return BillingAgreement
-            elif resource_type == "dispute":
-                from .disputes import Dispute
-                return Dispute
-            elif resource_type == "plan":
-                from .billing import BillingPlan
-                return BillingPlan
-            elif resource_type == "refund":
-                from .payments import Refund
-                return Refund
-            if resource_type == "sale":
-                from .payments import Sale
-                return Sale
-            raise NotImplementedError("Unimplemented webhook resource: %r" % (self.resource_type))
+    @property
+    def resource_model(self):
+        resource_type = self.resource_type.lower()
+        if resource_type == "agreement":
+            from .billing import BillingAgreement
+            return BillingAgreement
+        elif resource_type == "dispute":
+            from .disputes import Dispute
+            return Dispute
+        elif resource_type == "plan":
+            from .billing import BillingPlan
+            return BillingPlan
+        elif resource_type == "refund":
+            from .payments import Refund
+            return Refund
+        if resource_type == "sale":
+            from .payments import Sale
+            return Sale
+        raise NotImplementedError("Unimplemented webhook resource: %r" % (self.resource_type))
 
-        @property
-        def resource_id(self):
-            cls = self.resource_model
-            return self.resource[cls.id_field_name]
+    @property
+    def resource_id(self):
+        cls = self.resource_model
+        return self.resource[cls.id_field_name]
 
-        def create_or_update_resource(self):
-            if self.event_type.lower().startswith("risk.dispute."):
-                # risk.dispute.* events are a different kind of dispute object.
-                # Also, who the **** knows what these objects actually are.
-                # TODO: Get/Create the actual dispute object.
-                # Depends on SDK implementation which is currently missing:
-                # https://github.com/paypal/PayPal-Python-SDK/issues/216
-                return
+    def create_or_update_resource(self):
+        if self.event_type.lower().startswith("risk.dispute."):
+            # risk.dispute.* events are a different kind of dispute object.
+            # Also, who the **** knows what these objects actually are.
+            # TODO: Get/Create the actual dispute object.
+            # Depends on SDK implementation which is currently missing:
+            # https://github.com/paypal/PayPal-Python-SDK/issues/216
+            return
 
-            model = self.resource_model
-            return model.get_or_update_from_api_data(self.resource)
+        model = self.resource_model
+        return model.get_or_update_from_api_data(self.resource)
 
-        def get_resource(self):
-            cls = self.resource_model
-            return cls.objects.get(**{cls.id_field_name: self.resource_id})
+    def get_resource(self):
+        cls = self.resource_model
+        return cls.objects.get(**{cls.id_field_name: self.resource_id})
 
-        def send_signal(self):
-            event_type = self.event_type.lower()
-            signal = WEBHOOK_SIGNALS.get(event_type)
-            if signal:
-                signal.send(sender=self.__class__, event=self)
+    def send_signal(self):
+        event_type = self.event_type.lower()
+        signal = WEBHOOK_SIGNALS.get(event_type)
+        if signal:
+            signal.send(sender=self.__class__, event=self)
 
 
 class WebhookEventTrigger(models.Model):
@@ -160,8 +160,8 @@ class WebhookEventTrigger(models.Model):
         default=get_version,
         help_text="The version of dj-paypal when the webhook was received"
     )
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
     @classmethod
     def from_request(cls, request, webhook_id=PAYPAL_WEBHOOK_ID):
@@ -186,71 +186,69 @@ class WebhookEventTrigger(models.Model):
         except Exception:
             body = "(error decoding body)"
 
-            ip = request.META["REMOTE_ADDR"]
-            obj = cls.objects.create(headers=headers, body=body, remote_ip=ip)
+        ip = request.META["REMOTE_ADDR"]
+        obj = cls.objects.create(headers=headers, body=body, remote_ip=ip)
 
-            try:
-                obj.valid = obj.verify(PAYPAL_WEBHOOK_ID)
-                if obj.valid:
-                    # Process the item (do not save it, it'll get saved below)
-                    obj.process(save=False)
-            except Exception as e:
-                max_length = WebhookEventTrigger._meta.get_field("exception").max_length
-                obj.exception = str(e)[:max_length]
-                obj.traceback = format_exc()
-                webhook_error.send(sender=obj, exception=e)
-            finally:
-                obj.save()
+        try:
+            obj.valid = obj.verify(PAYPAL_WEBHOOK_ID)
+            if obj.valid:
+                # Process the item (do not save it, it'll get saved below)
+                obj.process(save=False)
+        except Exception as e:
+            max_length = WebhookEventTrigger._meta.get_field("exception").max_length
+            obj.exception = str(e)[:max_length]
+            obj.traceback = format_exc()
+            webhook_error.send(sender=obj, exception=e)
+        finally:
+            obj.save()
+        return obj
 
-                return obj
+    @cached_property
+    def data(self):
+        try:
+            return json.loads(self.body)
+        except ValueError:
+            return {}
 
-        @cached_property
-        def data(self):
-            try:
-                return json.loads(self.body)
-            except ValueError:
-                return {}
+    @property
+    def auth_algo(self):
+        return self.headers.get("paypal-auth-algo", "")
 
-        @property
-        def auth_algo(self):
-            return self.headers.get("paypal-auth-algo", "")
+    @property
+    def cert_url(self):
+        return self.headers.get("paypal-cert-url", "")
 
-        @property
-        def cert_url(self):
-            return self.headers.get("paypal-cert-url", "")
+    @property
+    def transmission_id(self):
+        return self.headers.get("paypal-transmission-id", "")
 
-        @property
-        def transmission_id(self):
-            return self.headers.get("paypal-transmission-id", "")
+    @property
+    def transmission_sig(self):
+        return self.headers.get("paypal-transmission-sig", "")
 
-        @property
-        def transmission_sig(self):
-            return self.headers.get("paypal-transmission-sig", "")
+    @property
+    def transmission_time(self):
+        return self.headers.get("paypal-transmission-time", "")
 
-        @property
-        def transmission_time(self):
-            return self.headers.get("paypal-transmission-time", "")
+    def verify(self, webhook_id):
+        return paypal_models.WebhookEvent.verify(
+            transmission_id=self.transmission_id,
+            timestamp=self.transmission_time,
+            webhook_id=webhook_id,
+            event_body=self.body,
+            cert_url=self.cert_url,
+            actual_sig=self.transmission_sig,
+            auth_algo=self.auth_algo,
+        )
 
-        def verify(self, webhook_id):
-            return paypal_models.WebhookEvent.verify(
-                transmission_id=self.transmission_id,
-                timestamp=self.transmission_time,
-                webhook_id=webhook_id,
-                event_body=self.body,
-                cert_url=self.cert_url,
-                actual_sig=self.transmission_sig,
-                auth_algo=self.auth_algo,
-            )
-
-        def process(self, save=True):
-            self.webhook_event = WebhookEvent.process(self.data)
-            self.processed = True
-            self.exception = ""
-            self.traceback = ""
-            if save:
-                self.save()
-
-                return self.webhook_event
+    def process(self, save=True):
+        self.webhook_event = WebhookEvent.process(self.data)
+        self.processed = True
+        self.exception = ""
+        self.traceback = ""
+        if save:
+            self.save()
+        return self.webhook_event
 
 
 def webhook_handler(*event_types):
@@ -287,15 +285,15 @@ def webhook_handler(*event_types):
             for t in WEBHOOK_EVENT_TYPES:
                 if fnmatch(t, event_type):
                     event_types_to_register.add(t)
-                elif event_type not in WEBHOOK_EVENT_TYPES:
-                    raise ValueError("Unknown webhook event: %r" % (event_type))
-                else:
-                    event_types_to_register.add(event_type)
+        elif event_type not in WEBHOOK_EVENT_TYPES:
+            raise ValueError("Unknown webhook event: %r" % (event_type))
+        else:
+            event_types_to_register.add(event_type)
 
-        # Now register them
-        def decorator(func):
-            for event_type in event_types_to_register:
-                WEBHOOK_SIGNALS[event_type].connect(func)
-                return func
+    # Now register them
+    def decorator(func):
+        for event_type in event_types_to_register:
+            WEBHOOK_SIGNALS[event_type].connect(func)
+        return func
 
-        return decorator
+    return decorator
