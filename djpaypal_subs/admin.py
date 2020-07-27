@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Product, Plan, Subscription, WebhookEvent, WebhookEventTrigger
-from .settings import PAYPAL_SUBS_WEBHOOK_ID
+from djpaypal_subs.models import Product, Plan, Subscription, WebhookEvent, WebhookEventTrigger
+from djpaypal_subs.settings import PAYPAL_SUBS_WEBHOOK_ID
 
 
 class BasePaypalModelAdmin(admin.ModelAdmin):

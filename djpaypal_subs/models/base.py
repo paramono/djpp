@@ -2,8 +2,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.decorators import classproperty
 
-from ..api import PaypalApi
-from ..constants import APIMODE_CHOICES
+from djpaypal_subs.api import PaypalApi
+from djpaypal_subs.constants import APIMODE_CHOICES
 
 
 class PaypalModel(models.Model):

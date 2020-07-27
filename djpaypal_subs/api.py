@@ -3,10 +3,10 @@ from django.utils.decorators import classproperty
 
 import requests
 
-from .constants import (
+from djpaypal_subs.constants import (
     APIMODE_SANDBOX, APIMODE_LIVE,
 )
-from .settings import (
+from djpaypal_subs.settings import (
     PAYPAL_SUBS_CLIENT_ID, PAYPAL_SUBS_SECRET,
     PAYPAL_SUBS_API_BASE_URL_SANDBOX, PAYPAL_SUBS_API_BASE_URL_LIVE, PAYPAL_SUBS_API_BASE_URL,
 )

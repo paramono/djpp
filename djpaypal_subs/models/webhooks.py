@@ -8,9 +8,9 @@ from django.dispatch import Signal
 from django.utils.functional import cached_property
 from paypalrestsdk import notifications as paypal_models
 
-from ..settings import PAYPAL_SUBS_WEBHOOK_ID
-from ..utils import fix_django_headers, get_version
-from .base import PaypalModel
+from djpaypal_subs.settings import PAYPAL_SUBS_WEBHOOK_ID
+from djpaypal_subs.utils import fix_django_headers, get_version
+from djpaypal_subs.models.base import PaypalModel
 
 
 WEBHOOK_EVENT_TYPES = {
