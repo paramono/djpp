@@ -16,6 +16,7 @@ from .base import PaypalModel
 WEBHOOK_EVENT_TYPES = {
     "billing.plan.created",
     "billing.plan.updated",
+    "billing.subscription.activated",
     "billing.subscription.cancelled",
     "billing.subscription.created",
     "billing.subscription.re-activated",
