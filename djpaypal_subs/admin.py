@@ -21,6 +21,7 @@ class PlanAdmin(admin.ModelAdmin):
         'create_time', 'update_time'
     ]
     list_filter = ['apimode', 'status']
+    raw_id_fields = ['product']
 
 
 @admin.register(Subscription)
@@ -33,3 +34,4 @@ class SubscriptionAdmin(admin.ModelAdmin):
         'create_time', 'update_time'
     ]
     list_filter = ['apimode', 'status']
+    raw_id_fields = ['plan']
