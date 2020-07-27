@@ -33,6 +33,11 @@ class PaypalModel(models.Model):
     # into this JSON field - useful if PayPal changes their response json
     _extra_fields = JSONField(default=dict)
 
+    def __str__(self):
+        if hasattr(self, "name") and self.name:
+            return self.name
+        return self.id
+
     @classproperty
     def field_names(cls):
         '''
