@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import Product, Plan, Subscription, WebhookEvent, WebhookEventTrigger
-from .settings import PAYPAL_WEBHOOK_ID
+from .settings import PAYPAL_SUBS_WEBHOOK_ID
 
 
 class BasePaypalModelAdmin(admin.ModelAdmin):
@@ -98,7 +98,7 @@ class WebhookEventTriggerAdmin(admin.ModelAdmin):
 
     def reverify(self, request, queryset):
         for trigger in queryset:
-            if trigger.verify(webhook_id=PAYPAL_WEBHOOK_ID):
+            if trigger.verify(webhook_id=PAYPAL_SUBS_WEBHOOK_ID):
                 trigger.valid = True
                 trigger.save()
 

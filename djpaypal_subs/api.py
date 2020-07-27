@@ -5,13 +5,16 @@ import requests
 
 from .constants import (
     APIMODE_SANDBOX, APIMODE_LIVE,
-    PAYPAL_API_BASE_URL_SANDBOX, PAYPAL_API_BASE_URL_LIVE, PAYPAL_API_BASE_URL,
+)
+from .settings import (
+    PAYPAL_SUBS_CLIENT_ID, PAYPAL_SUBS_SECRET,
+    PAYPAL_SUBS_API_BASE_URL_SANDBOX, PAYPAL_SUBS_API_BASE_URL_LIVE, PAYPAL_SUBS_API_BASE_URL,
 )
 
 
 class PaypalApi(object):
-    client_id = settings.PAYPAL_SUBSCRIPTIONS_CLIENT_ID
-    secret    = settings.PAYPAL_SUBSCRIPTIONS_SECRET
+    client_id = PAYPAL_SUBS_CLIENT_ID
+    secret    = PAYPAL_SUBS_SECRET
     _token    = None
 
     @classproperty
@@ -25,11 +28,11 @@ class PaypalApi(object):
     @classmethod
     def build_endpoint(cls, endpoint, endpoint_id=None, mode='settings'):
         if mode == 'settings':
-            url = PAYPAL_API_BASE_URL + endpoint
+            url = PAYPAL_SUBS_API_BASE_URL + endpoint
         elif mode == APIMODE_SANDBOX:
-            url = PAYPAL_API_BASE_URL_SANDBOX + endpoint
+            url = PAYPAL_SUBS_API_BASE_URL_SANDBOX + endpoint
         elif mode == APIMODE_LIVE:
-            url = PAYPAL_API_BASE_URL_LIVE + endpoint
+            url = PAYPAL_SUBS_API_BASE_URL_LIVE + endpoint
 
         if endpoint_id:
             url += '/%s' % endpoint_id
@@ -45,12 +48,8 @@ class PaypalApi(object):
         }
         data = dict(grant_type='client_credentials')
 
-        client_id = client_id or settings.PAYPAL_SUBSCRIPTIONS_CLIENT_ID
-        secret    = secret or settings.PAYPAL_SUBSCRIPTIONS_SECRET
-
-        # print(f'url: {url}')
-        # print(f'client_id: {client_id}')
-        # print(f'secret: {secret}')
+        client_id = client_id or cls.client_id
+        secret    = secret or cls.secret
 
         r = requests.post(url, headers=headers, data=data, auth=(client_id, secret))
         r.raise_for_status()

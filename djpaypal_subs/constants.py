@@ -8,14 +8,6 @@ APIMODE_CHOICES = [
     (APIMODE_LIVE, 'Live'),
 ]
 
-PAYPAL_API_BASE_URL_SANDBOX = 'https://api.sandbox.paypal.com'
-PAYPAL_API_BASE_URL_LIVE    = 'https://api.paypal.com'
-
-if settings.PAYPAL_SUBSCRIPTIONS_MODE == 'sandbox':
-    PAYPAL_API_BASE_URL = PAYPAL_API_BASE_URL_SANDBOX
-elif settings.PAYPAL_SUBSCRIPTIONS_MODE == 'live':
-    PAYPAL_API_BASE_URL = PAYPAL_API_BASE_URL_LIVE
-
 # Products
 PRODUCTS_ENDPOINT = '/v1/catalogs/products'
 

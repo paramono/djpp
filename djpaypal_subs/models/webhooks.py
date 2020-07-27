@@ -8,7 +8,7 @@ from django.dispatch import Signal
 from django.utils.functional import cached_property
 from paypalrestsdk import notifications as paypal_models
 
-from ..settings import PAYPAL_WEBHOOK_ID
+from ..settings import PAYPAL_SUBS_WEBHOOK_ID
 from ..utils import fix_django_headers, get_version
 from .base import PaypalModel
 
@@ -164,13 +164,13 @@ class WebhookEventTrigger(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
     @classmethod
-    def from_request(cls, request, webhook_id=PAYPAL_WEBHOOK_ID):
+    def from_request(cls, request, webhook_id=PAYPAL_SUBS_WEBHOOK_ID):
         """
         Create, validate and process a WebhookEventTrigger given a Django
         request object.
 
         The webhook_id parameter expects the ID of the Webhook that was
-        triggered (defaults to settings.PAYPAL_WEBHOOK_ID). This is required
+        triggered (defaults to settings.PAYPAL_SUBS_WEBHOOK_ID). This is required
         for Webhook verification.
 
         The process is three-fold:
@@ -190,7 +190,7 @@ class WebhookEventTrigger(models.Model):
         obj = cls.objects.create(headers=headers, body=body, remote_ip=ip)
 
         try:
-            obj.valid = obj.verify(PAYPAL_WEBHOOK_ID)
+            obj.valid = obj.verify(PAYPAL_SUBS_WEBHOOK_ID)
             if obj.valid:
                 # Process the item (do not save it, it'll get saved below)
                 obj.process(save=False)
