@@ -14,7 +14,7 @@ readme = ''
 setup(
     long_description=readme,
     name='djpaypal_subs',
-    version='0.1.4',
+    version='0.1.5',
     python_requires='==3.*,>=3.5.0',
     author='paramono',
     author_email='alex@paramono.com',
@@ -23,6 +23,6 @@ setup(
     ],
     package_dir={"": "."},
     package_data={},
-    install_requires=[],
+    install_requires=['paypalrestsdk==1.*,>=1.13.1'],
     extras_require={"dev": ["pytest==5.*,>=5.2.0"]},
 )

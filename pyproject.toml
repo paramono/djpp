@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "djpaypal_subs"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = ["paramono <alex@paramono.com>"]
 
@@ -10,6 +10,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.5"
+paypalrestsdk = "^1.13.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
