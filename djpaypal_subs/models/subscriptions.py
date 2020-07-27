@@ -1,35 +1,17 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from .constants import (
-    APIMODE_CHOICES, PRODUCT_TYPES, PLAN_STATUS_CHOICES,
-    SUBSCRIPTION_STATUS_CHOICES,
+from .base import PaypalModel
+from ..constants import (
+    PRODUCTS_ENDPOINT, PRODUCT_TYPES,
+    PLANS_ENDPOINT, PLAN_STATUS_CHOICES,
+    SUBSCRIPTIONS_ENDPOINT, SUBSCRIPTION_STATUS_CHOICES,
 )
-
-
-class PaypalModel(models.Model):
-    '''Defines common fields for all models'''
-
-    class Meta:
-        abstract = True
-
-    id = models.CharField(primary_key=True, db_index=True, max_length=50)
-    apimode = models.CharField(choices=APIMODE_CHOICES, max_length=24)
-
-    # These datetimes are synced from Paypal API
-    create_time = models.DateTimeField(blank=True, null=True)
-    update_time = models.DateTimeField(blank=True, null=True)
-
-    links = JSONField(default=list)
-
-    # These datetimes are handled by django automatically
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
 
 class Product(PaypalModel):
     '''https://developer.paypal.com/docs/api/catalog-products/v1/#products'''
-    endpoint = '/v1/catalogs/products'
+    endpoint = PRODUCTS_ENDPOINT
 
     name = models.CharField(max_length=127)
     description = models.CharField(max_length=256, blank=True)
@@ -41,13 +23,15 @@ class Product(PaypalModel):
 
 class Plan(PaypalModel):
     '''https://developer.paypal.com/docs/api/subscriptions/v1/#plans'''
-    endpoint = '/v1/billing/plans'
+    endpoint = PLANS_ENDPOINT
+    deferred_attrs = ['product_id']
 
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
 
     name = models.CharField(max_length=127)
     status = models.CharField(choices=PLAN_STATUS_CHOICES, max_length=24)
     description = models.CharField(max_length=127, blank=True)
+    usage_type = models.CharField(max_length=24, blank=True)
 
     billing_cycles = JSONField(default=list)  # array
     payment_preferences = JSONField()
@@ -57,7 +41,8 @@ class Plan(PaypalModel):
 
 class Subscription(PaypalModel):
     '''https://developer.paypal.com/docs/api/subscriptions/v1/#subscriptions'''
-    endpoint = '/v1/billing/subscriptions'
+    endpoint = SUBSCRIPTIONS_ENDPOINT
+    deferred_attrs = ['plan_id']
 
     plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
 
