@@ -171,8 +171,8 @@ class WebhookEvent(PaypalModel):
     @classmethod
     def process(cls, data):
         ret, created = cls.get_or_update_from_api_data(data)
-        ret.create_or_update_resource()
-        if created:
+        resource, resource_created = ret.create_or_update_resource()
+        if resource_created:
             ret.send_signal()
         return ret
 
