@@ -50,8 +50,7 @@ def fix_django_headers(meta):
         #     continue
 
         ret[k.lower().replace("_", "-")] = v
-
-        return ret
+    return ret
 
 
 CURRENCY_SIGILS = {
