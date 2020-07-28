@@ -19,10 +19,10 @@ class ProcessWebhookView(View):
     If an exception happens during processing, returns HTTP 500.
     """
     def post(self, request):
-        if "HTTP_PAYPAL_TRANSMISSION_ID" not in request.META:
-            # Do not even attempt to process/store the event if there is
-            # no paypal transmission id so we avoid overfilling the db.
-            return HttpResponseBadRequest()
+        # if "HTTP_PAYPAL_TRANSMISSION_ID" not in request.META:
+        #     # Do not even attempt to process/store the event if there is
+        #     # no paypal transmission id so we avoid overfilling the db.
+        #     return HttpResponseBadRequest()
 
         trigger = WebhookEventTrigger.from_request(request)
 
