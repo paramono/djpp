@@ -45,9 +45,9 @@ def fix_django_headers(meta):
     for k, v in meta.items():
         if k.startswith("HTTP_"):
             k = k[len("HTTP_"):]
-        # elif k not in ("CONTENT_LENGTH", "CONTENT_TYPE"):
-        #     # Skip CGI garbage
-        #     continue
+        elif k not in ("CONTENT_LENGTH", "CONTENT_TYPE"):
+            # Skip CGI garbage
+            continue
 
         ret[k.lower().replace("_", "-")] = v
     return ret
