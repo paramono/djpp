@@ -47,12 +47,12 @@ class Subscription(PaypalModel):
     plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
 
     status = models.CharField(choices=SUBSCRIPTION_STATUS_CHOICES, max_length=24)
-    status_change_note = models.CharField(max_length=128)
+    status_change_note = models.CharField(max_length=128, blank=True)
     status_update_time = models.DateTimeField(blank=True, null=True)
 
     start_time = models.DateTimeField()
     quantity = models.CharField(max_length=32)
-    shipping_amount = JSONField()
-    subscriber = JSONField()
-    billing_info = JSONField()
-    application_context = JSONField()  # not returned
+    shipping_amount = JSONField(blank=True, null=True)
+    subscriber = JSONField(blank=True, null=True)
+    billing_info = JSONField(blank=True, null=True)
+    application_context = JSONField(blank=True, null=True)  # not returned
