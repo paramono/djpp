@@ -69,27 +69,31 @@ class PaypalModel(models.Model):
             else:
                 obj_details = obj
 
-            # Sometimes, PayPal returns fields not mentioned in their official
-            # documentation. Since update_or_create raises an Error when you
-            # try to insert a field that doesn't exist in a model, it's safer
-            # to pop non-existing fields from obj_details and insert them into
-            # a separate JSONField.
-            _extra_fields = {}
-            field_names = cls.field_names
-
-            items = list(obj_details.items())
-            for item in items:
-                print(item)
-
-            for k, v in list(obj_details.items()):
-                if k not in field_names:
-                    _extra_fields.update(k=v)
-                    obj_details.pop(k)
-            obj_details['_extra_fields'] = _extra_fields
-            print('obj_details', obj_details)
-            print()
-
+            obj_details = cls.make_dict_with_defined_fields()
             cls.objects.update_or_create(pk=pk, **obj_details)
+
+    @classmethod
+    def make_dict_with_defined_fields(cls, obj_details):
+        '''
+        Sometimes, PayPal returns fields not mentioned in their official
+        documentation. Since update_or_create raises an Error when you
+        try to insert a field that doesn't exist in a model, it's safer
+        to pop non-existing fields from obj_details and insert them into
+        a separate JSONField.
+        '''
+        _extra_fields = {}
+        field_names = cls.field_names
+
+        items = list(obj_details.items())
+        for item in items:
+            print(item)
+
+        for k, v in list(obj_details.items()):
+            if k not in field_names:
+                _extra_fields.update(k=v)
+                obj_details.pop(k)
+        obj_details['_extra_fields'] = _extra_fields
+        return obj_details
 
     @staticmethod
     def sdk_object_as_dict(obj):
@@ -116,6 +120,7 @@ class PaypalModel(models.Model):
     @classmethod
     def get_or_update_from_api_data(cls, data, always_sync=False):
         id, cleaned_data, m2ms = cls.clean_api_data(data)
+        cleaned_data = cls.make_dict_with_defined_fields(cleaned_data)
         db_obj, created = cls.objects.get_or_create(**{
             cls.id_field_name: id,
             "defaults": cleaned_data,
