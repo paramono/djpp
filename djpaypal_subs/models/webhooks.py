@@ -12,55 +12,137 @@ from djpaypal_subs.settings import PAYPAL_SUBS_WEBHOOK_ID
 from djpaypal_subs.utils import fix_django_headers, get_version
 from djpaypal_subs.models.base import PaypalModel
 
-
+# https://developer.paypal.com/docs/api-basics/notifications/webhooks/event-names/#
 WEBHOOK_EVENT_TYPES = {
-    "billing.plan.created",
-    "billing.plan.updated",
-    "billing.subscription.activated",
-    "billing.subscription.cancelled",
-    "billing.subscription.created",
-    "billing.subscription.re-activated",
-    "billing.subscription.suspended",
-    "billing.subscription.updated",
-    "customer.dispute.created",
-    "customer.dispute.resolved",
-    "identity.authorization-consent.revoked",
-    "invoicing.invoice.cancelled",
-    "invoicing.invoice.created",
-    "invoicing.invoice.paid",
-    "invoicing.invoice.refunded",
-    "invoicing.invoice.updated",
-    "merchant.onboarding.completed",
-    "payment.authorization.created",
-    "payment.authorization.voided",
-    "payment.capture.completed",
-    "payment.capture.denied",
-    "payment.capture.pending",
-    "payment.capture.refunded",
-    "payment.capture.reversed",
-    "payment.order.cancelled",
-    "payment.order.created",
-    "payment.payoutsbatch.denied",
-    "payment.payoutsbatch.processing",
-    "payment.payoutsbatch.success",
-    "payment.payouts-item.blocked",
-    "payment.payouts-item.canceled",
-    "payment.payouts-item.denied",
-    "payment.payouts-item.failed",
-    "payment.payouts-item.held",
-    "payment.payouts-item.refunded",
-    "payment.payouts-item.returned",
-    "payment.payouts-item.succeeded",
-    "payment.payouts-item.unclaimed",
-    "payment.sale.completed",
-    "payment.sale.denied",
-    "payment.sale.pending",
-    "payment.sale.refunded",
-    "payment.sale.reversed",
-    "risk.dispute.created",
-    "vault.credit-card.created",
-    "vault.credit-card.deleted",
-    "vault.credit-card.updated",
+    # Batch payouts
+    'payment.payoutsbatch.denied',
+    'payment.payoutsbatch.processing',
+    'payment.payoutsbatch.success',
+    'payment.payouts-item.blocked',
+    'payment.payouts-item.canceled',
+    'payment.payouts-item.denied',
+    'payment.payouts-item.failed',
+    'payment.payouts-item.held',
+    'payment.payouts-item.refunded',
+    'payment.payouts-item.returned',
+    'payment.payouts-item.succeeded',
+    'payment.payouts-item.unclaimed',
+
+    # Billing plans and agreements
+    'billing_agreements.agreement.created',
+    'billing_agreements.agreement.cancelled',
+
+    # These are listed in subscriptions
+    # 'billing.plan.created',
+    # 'billing.plan.updated',
+    # 'billing.subscription.cancelled',
+    # 'billing.subscription.created',
+    # 'billing.subscription.re-activated',  # old API
+    # 'billing.subscription.suspended',
+    # 'billing.subscription.updated',
+
+    # Connect with PayPal
+    'identity.authorization-consent.revoked',
+
+    # Checkout buyer approval
+    'payments.payment.created',
+    'checkout.order.approved',
+    'checkout.checkout.buyer-approved',
+
+    # Disputes
+    'customer.dispute.created',
+    'customer.dispute.resolved',
+    'customer.dispute.updated',
+    'risk.dispute.created',
+
+    # Invoicing
+    'invoicing.invoice.cancelled',
+    'invoicing.invoice.created',
+    'invoicing.invoice.paid',
+    'invoicing.invoice.refunded',
+    'invoicing.invoice.scheduled',
+    'invoicing.invoice.updated',
+
+    # Merchant onboarding
+    'merchant.onboarding.completed',
+    'merchant.partner-consent.revoked',
+
+    # Orders
+
+    # v2
+    'checkout.order.completed'
+    # 'checkout.order.approved'  # listed above
+
+    # v1
+    'checkout.order.processed'
+
+
+    # PayPal Commerce Platform
+    # 'checkout.order.processed'  # listed above
+    'customer.account-limitation.added'
+    'customer.account-limitation.escalated'
+    'customer.account-limitation.lifted'
+    'customer.account-limitation.updated'
+    # 'merchant.onboarding.completed'  # listed above
+    # 'merchant.partner-consent.revoked'  # listed above
+    # 'payment.capture.completed'  # listed above
+    # 'payment.capture.denied'  # listed above
+    # 'payment.capture.refunded'  # listed above
+    'payment.referenced-payout-item.completed'
+    'payment.referenced-payout-item.failed'
+
+    # Payment orders
+    'payment.order.cancelled',
+    'payment.order.created',
+
+    # Referenced payouts (all listed above)
+    # 'payment.referenced-payout-item.completed'
+    # 'payment.referenced-payout-item.failed'
+
+    # Sales
+    'payment.sale.completed',
+    'payment.sale.denied',
+    'payment.sale.pending',
+    'payment.sale.refunded',
+    'payment.sale.reversed',
+
+    # Subscriptions
+    # https://developer.paypal.com/docs/api-basics/notifications/webhooks/event-names/#subscriptions
+    'catalog.product.created',
+    'catalog.product.updated',
+
+    'payment.sale.completed',
+    'payment.sale.refunded',
+    'payment.sale.reversed',
+
+    'billing.plan.created',
+    'billing.plan.updated',
+    'billing.plan.activated',
+    'billing.plan.pricing-change.activated',
+    'billing.plan.deactivated',
+
+    'billing.subscription.created',
+    'billing.subscription.activated',
+    'billing.subscription.updated',
+    'billing.subscription.expired',
+    'billing.subscription.cancelled',
+    'billing.subscription.suspended',
+    'billing.subscription.payment.failed',
+    'billing.subscription.re-activated',  # old API
+
+    # Authorized and captured payments (v1 and v2 event names are identical)
+    'payment.authorization.created',
+    'payment.authorization.voided',
+    'payment.capture.completed',
+    'payment.capture.denied',
+    'payment.capture.pending',
+    'payment.capture.refunded',
+    'payment.capture.reversed',
+
+    # Vault
+    'vault.credit-card.created',
+    'vault.credit-card.deleted',
+    'vault.credit-card.updated',
 }
 
 WEBHOOK_SIGNALS = {
