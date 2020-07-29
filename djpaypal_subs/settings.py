@@ -16,12 +16,12 @@ if PAYPAL_SUBS_MODE == 'sandbox':
 elif PAYPAL_SUBS_MODE == 'live':
     PAYPAL_SUBS_API_BASE_URL = PAYPAL_SUBS_API_BASE_URL_LIVE
 
-# PAYPAL_SETTINGS = {
-# 	"mode": PAYPAL_MODE,
-# 	"client_id": PAYPAL_CLIENT_ID,
-# 	"client_secret": PAYPAL_CLIENT_SECRET,
-# }
+PAYPAL_SETTINGS = {
+    "mode": PAYPAL_SUBS_MODE,
+    "client_id": PAYPAL_SUBS_CLIENT_ID,
+    "client_secret": PAYPAL_SUBS_SECRET,
+}
 
-# if PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET:
-# 	from paypalrestsdk import configure
-# 	configure(PAYPAL_SETTINGS)
+if PAYPAL_SUBS_CLIENT_ID and PAYPAL_SUBS_SECRET:
+    from paypalrestsdk import configure
+    configure(PAYPAL_SETTINGS)
