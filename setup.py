@@ -14,7 +14,7 @@ readme = ''
 setup(
     long_description=readme,
     name='djpaypal_subs',
-    version='0.2.1',
+    version='0.2.2',
     python_requires='==3.*,>=3.5.0',
     author='paramono',
     author_email='alex@paramono.com',

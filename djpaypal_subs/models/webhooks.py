@@ -189,6 +189,21 @@ class WebhookEvent(PaypalModel):
         elif resource_type == 'subscription':
             from .subscriptions import Subscription
             return Subscription
+        elif resource_type == 'agreement':
+            from .billing import BillingAgreement
+            return BillingAgreement
+        elif resource_type == 'dispute':
+            from .disputes import Dispute
+            return Dispute
+        elif resource_type == 'plan':
+            from .billing import BillingPlan
+            return BillingPlan
+        elif resource_type == 'refund':
+            from .payments import Refund
+            return Refund
+        elif resource_type == 'sale':
+            from .payments import Sale
+            return Sale
         raise NotImplementedError("Unimplemented webhook resource: %r" % (self.resource_type))
 
     @property
