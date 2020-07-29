@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils import timezone
 
-from djpaypal_subs.models import Product, Plan, Subscription, WebhookEvent, WebhookEventTrigger
-from djpaypal_subs.settings import PAYPAL_SUBS_WEBHOOK_ID
+from . import models
+from .settings import PAYPAL_SUBS_WEBHOOK_ID
 
 
 class BasePaypalModelAdmin(admin.ModelAdmin):
@@ -33,17 +34,140 @@ class BasePaypalModelAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(Product)
+@admin.register(models.BillingPlan)
+class BillingPlanAdmin(BasePaypalModelAdmin):
+    list_display = ("state", "type", "create_time")
+    list_filter = ("type", "state", "create_time", "update_time")
+    raw_id_fields = ("payment_definitions", )
+
+    def activate_plans(self, request, queryset):
+        for obj in queryset:
+            obj.activate()
+
+    actions = (activate_plans, )
+
+
+@admin.register(models.BillingAgreement)
+class BillingAgreementAdmin(BasePaypalModelAdmin):
+    list_display = ("user", "state")
+    list_filter = ("state", )
+    raw_id_fields = ("user", "payer_model")
+
+    def cancel(self, request, queryset):
+        for agreement in queryset:
+            agreement.cancel(note="Cancelled by admin", immediately=False)
+    cancel.short_description = "Cancel selected agreements at end of billing period"
+
+    def cancel_immediately(self, request, queryset):
+        for agreement in queryset:
+            agreement.cancel(note="Cancelled by admin", immediately=True)
+    cancel_immediately.short_description = "Cancel selected agreements immediately"
+
+    def expire(self, request, queryset):
+        for agreement in queryset:
+            agreement.end_of_period = timezone.now()
+            agreement.save()
+    expire.short_description = "Mark selected agreements as expired"
+
+    actions = (cancel, cancel_immediately, expire)
+
+
+@admin.register(models.PreparedBillingAgreement)
+class PreparedBillingAgreementAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__", "apimode", "user", "executed_agreement", "executed_at",
+        "created", "updated"
+    )
+    list_filter = ("apimode", "executed_at")
+    readonly_fields = ("id", "created", "updated")
+    raw_id_fields = ("user", "executed_agreement")
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(models.ChargeModel)
+class ChargeModelAdmin(BasePaypalModelAdmin):
+    list_display = ("type", )
+    list_filter = ("type", )
+
+
+@admin.register(models.Dispute)
+class DisputeAdmin(BasePaypalModelAdmin):
+    list_display = ("status", "reason", "create_time")
+    list_filter = ("status", "reason")
+    ordering = ("-create_time", )
+    readonly_fields = (
+        "create_time", "update_time", "disputed_transactions", "reason",
+        "dispute_amount", "dispute_outcome", "seller_response_due_date",
+        "dispute_flow"
+    )
+
+
+@admin.register(models.Payer)
+class PayerAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__", "first_name", "last_name", "email", "user", "apimode"
+    )
+    search_fields = ("id", "first_name", "last_name", "email")
+    raw_id_fields = ("user", )
+
+    def has_add_permission(self, request):
+        return False
+
+
+@admin.register(models.PaymentDefinition)
+class PaymentDefinitionAdmin(BasePaypalModelAdmin):
+    list_display = (
+        "type", "frequency", "frequency_interval", "cycles",
+    )
+    list_filter = ("type", "frequency")
+    raw_id_fields = ("charge_models", )
+
+
+@admin.register(models.Refund)
+class RefundAdmin(BasePaypalModelAdmin):
+    date_hierarchy = "create_time"
+    list_display = (
+        "state", "invoice_number", "refund_reason_code", "create_time",
+    )
+    list_filter = ("refund_reason_code", )
+    raw_id_fields = ("sale", "parent_payment")
+    ordering = ("-create_time", )
+    readonly_fields = (
+        "state", "sale", "parent_payment", "refund_reason_code",
+        "refund_funding_type", "create_time", "update_time",
+    )
+
+
+@admin.register(models.Sale)
+class SaleAdmin(BasePaypalModelAdmin):
+    date_hierarchy = "create_time"
+    list_display = ("state", "create_time", "update_time")
+    list_filter = ("state", "payment_mode")
+    raw_id_fields = ("billing_agreement", "parent_payment")
+    ordering = ("-create_time", )
+    readonly_fields = (
+        "amount", "payment_mode", "state", "reason_code",
+        "protection_eligibility", "protection_eligibility_type",
+        "clearing_time", "transaction_fee", "receivable_amount",
+        "exchange_rate", "fmf_details", "receipt_id", "parent_payment",
+        "processor_response", "billing_agreement", "soft_descriptor",
+        "create_time", "update_time",
+    )
+    search_fields = ("receipt_id", )
+
+
+@admin.register(models.Product)
 class ProductAdmin(BasePaypalModelAdmin):
     list_display = (
-        'id', 'apimode',
-        'name', 'description', 'type', 'category',
+        'id', 'apimode', 'name', 'description', 'type', 'category',
         'create_time', 'update_time',
     )
     list_filter = ('apimode', 'type', )
 
 
-@admin.register(Plan)
+@admin.register(models.Plan)
 class PlanAdmin(BasePaypalModelAdmin):
     list_display = (
         'id', 'apimode',
@@ -55,7 +179,7 @@ class PlanAdmin(BasePaypalModelAdmin):
     raw_id_fields = ('product', )
 
 
-@admin.register(Subscription)
+@admin.register(models.Subscription)
 class SubscriptionAdmin(BasePaypalModelAdmin):
     list_display = (
         'id', 'apimode',
@@ -68,7 +192,7 @@ class SubscriptionAdmin(BasePaypalModelAdmin):
     raw_id_fields = ('plan', )
 
 
-@admin.register(WebhookEvent)
+@admin.register(models.WebhookEvent)
 class WebhookEventAdmin(BasePaypalModelAdmin):
     list_display = ("event_type", "resource_type", "resource_id_link", "create_time", )
     list_filter = ("create_time", "event_type", )
@@ -88,7 +212,7 @@ class WebhookEventAdmin(BasePaypalModelAdmin):
     resource_id_link.short_description = "Resource Id"
 
 
-@admin.register(WebhookEventTrigger)
+@admin.register(models.WebhookEventTrigger)
 class WebhookEventTriggerAdmin(admin.ModelAdmin):
     list_display = (
         "date_created", "date_modified", "valid", "processed", "exception", "webhook_event",
@@ -109,7 +233,7 @@ class WebhookEventTriggerAdmin(admin.ModelAdmin):
                 continue
             trigger.process()
 
-        def has_add_permission(self, request):
-            return False
+    def has_add_permission(self, request):
+        return False
 
     actions = (reverify, reprocess)
