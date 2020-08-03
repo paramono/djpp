@@ -35,7 +35,7 @@ class Plan(PaypalModel):
 
     billing_cycles = JSONField(default=list)  # array
     payment_preferences = JSONField()
-    taxes = JSONField()
+    taxes = JSONField(blank=True, null=True)
     quantity_supported = models.BooleanField(default=False)
 
 
