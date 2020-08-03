@@ -69,7 +69,7 @@ class PaypalModel(models.Model):
             else:
                 obj_details = obj
 
-            obj_details = cls.make_dict_with_defined_fields()
+            obj_details = cls.make_dict_with_defined_fields(obj_details)
             cls.objects.update_or_create(pk=pk, **obj_details)
 
     @classmethod
