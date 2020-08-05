@@ -206,7 +206,7 @@ class WebhookEvent(PaypalModel):
             return Sale
         elif resource_type == 'checkout-order':
             from .orders import CheckoutOrder
-            return Sale
+            return CheckoutOrder
         raise NotImplementedError("Unimplemented webhook resource: %r" % (self.resource_type))
 
     @property
