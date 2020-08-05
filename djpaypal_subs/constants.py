@@ -1,11 +1,11 @@
-from django.conf import settings
+from django.utils.translation import gettext as _
 
 APIMODE_SANDBOX = 'sandbox'
 APIMODE_LIVE = 'live'
 
 APIMODE_CHOICES = [
-    (APIMODE_SANDBOX, 'Sandbox'),
-    (APIMODE_LIVE, 'Live'),
+    (APIMODE_SANDBOX, _('Sandbox')),
+    (APIMODE_LIVE,    _('Live')),
 ]
 
 # Products
@@ -16,22 +16,22 @@ PRODUCT_TYPE_DIGITAL  = 'DIGITAL'
 PRODUCT_TYPE_SERVICE  = 'SERVICE'
 
 PRODUCT_TYPES = [
-    (PRODUCT_TYPE_PHYSICAL, 'Physical'),
-    (PRODUCT_TYPE_DIGITAL,  'Digital'),
-    (PRODUCT_TYPE_SERVICE,  'Service'),
+    (PRODUCT_TYPE_PHYSICAL, _('Physical')),
+    (PRODUCT_TYPE_DIGITAL,  _('Digital')),
+    (PRODUCT_TYPE_SERVICE,  _('Service')),
 ]
 
 # Plans
 PLANS_ENDPOINT = '/v1/billing/plans'
 
-PLAN_STATUS_CREATED  = 'CREATED'
-PLAN_STATUS_INACTIVE = 'INACTIVE'
-PLAN_STATUS_ACTIVE   = 'ACTIVE'
+PLAN_STATUS_CREATED  = _('CREATED')
+PLAN_STATUS_INACTIVE = _('INACTIVE')
+PLAN_STATUS_ACTIVE   = _('ACTIVE')
 
 PLAN_STATUS_CHOICES = [
-    (PLAN_STATUS_CREATED, 'Created'),
-    (PLAN_STATUS_INACTIVE, 'Inactive'),
-    (PLAN_STATUS_ACTIVE, 'Active'),
+    (PLAN_STATUS_CREATED,  _('Created')),
+    (PLAN_STATUS_INACTIVE, _('Inactive')),
+    (PLAN_STATUS_ACTIVE,   _('Active')),
 ]
 
 # Subscriptions
@@ -45,10 +45,32 @@ SUBSCRIPTION_STATUS_CANCELLED        = 'CANCELLED'
 SUBSCRIPTION_STATUS_EXPIRED          = 'EXPIRED'
 
 SUBSCRIPTION_STATUS_CHOICES = [
-    (SUBSCRIPTION_STATUS_APPROVAL_PENDING, 'Approval pending'),
-    (SUBSCRIPTION_STATUS_APPROVED,         'Approved'),
-    (SUBSCRIPTION_STATUS_ACTIVE,           'Active'),
-    (SUBSCRIPTION_STATUS_SUSPENDED,        'Suspended'),
-    (SUBSCRIPTION_STATUS_CANCELLED,        'Cancelled'),
-    (SUBSCRIPTION_STATUS_EXPIRED,          'Expired'),
+    (SUBSCRIPTION_STATUS_APPROVAL_PENDING, _('Approval pending')),
+    (SUBSCRIPTION_STATUS_APPROVED,         _('Approved')),
+    (SUBSCRIPTION_STATUS_ACTIVE,           _('Active')),
+    (SUBSCRIPTION_STATUS_SUSPENDED,        _('Suspended')),
+    (SUBSCRIPTION_STATUS_CANCELLED,        _('Cancelled')),
+    (SUBSCRIPTION_STATUS_EXPIRED,          _('Expired')),
 ]
+
+ORDER_INTENT_CAPTURE   = 'CAPTURE'
+ORDER_INTENT_AUTHORIZE = 'AUTHORIZE'
+
+ORDER_INTENT_CHOICES = (
+    (ORDER_INTENT_CAPTURE,   _('Capture')),
+    (ORDER_INTENT_AUTHORIZE, _('Authorize')),
+)
+
+ORDER_STATUS_CREATED   = 'CREATED'
+ORDER_STATUS_SAVED     = 'SAVED'
+ORDER_STATUS_APPROVED  = 'APPROVED'
+ORDER_STATUS_VOIDED    = 'VOIDED'
+ORDER_STATUS_COMPLETED = 'COMPLETED'
+
+ORDER_STATUS_CHOICES = (
+    (ORDER_STATUS_CREATED,   _('Created')),
+    (ORDER_STATUS_SAVED,     _('Saved')),
+    (ORDER_STATUS_APPROVED,  _('Approved')),
+    (ORDER_STATUS_VOIDED,    _('Voided')),
+    (ORDER_STATUS_COMPLETED, _('Completed')),
+)

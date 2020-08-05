@@ -158,6 +158,20 @@ class SaleAdmin(BasePaypalModelAdmin):
     search_fields = ("receipt_id", )
 
 
+@admin.register(models.CheckoutOrder)
+class CheckoutOrderAdmin(BasePaypalModelAdmin):
+    date_hierarchy = 'create_time'
+    list_display = ('intent', 'status', 'create_time', 'update_time')
+    list_filter = ('intent', 'status')
+    # raw_id_fields = ("billing_agreement", "parent_payment")
+    ordering = ('-create_time', )
+    readonly_fields = (
+        'payment_source', 'intent', 'payer', 'purchase_units', 'status',
+        'create_time', 'update_time',
+    )
+    search_fields = ('id', )
+
+
 @admin.register(models.Product)
 class ProductAdmin(BasePaypalModelAdmin):
     list_display = (
