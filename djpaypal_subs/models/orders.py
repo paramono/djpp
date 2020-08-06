@@ -37,5 +37,6 @@ class Capture(PaypalModel):
     final_capture = models.BooleanField()
     seller_receivable_breakdown = JSONField()
 
-    disbursement_mode = models.CharField(choices=DISBURSEMENT_MODE_CHOICES, blank=True)
+    disbursement_mode = models.CharField(choices=DISBURSEMENT_MODE_CHOICES,
+                                         max_length=24, blank=True)
     supplementary_data = JSONField(default=dict)
