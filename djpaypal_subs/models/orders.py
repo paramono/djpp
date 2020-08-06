@@ -27,7 +27,7 @@ class Capture(PaypalModel):
     This resource is sent to webhook when you try to capture CheckoutOrder
     '''
     status = models.CharField(choices=CAPTURE_STATUS_CHOICES, max_length=24)
-    status_details = JSONField()
+    status_details = JSONField(default=dict)
     amount = CurrencyAmountField()
 
     invoice_id = models.CharField(max_length=255, blank=True)
