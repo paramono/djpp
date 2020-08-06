@@ -30,8 +30,8 @@ class Capture(PaypalModel):
     status_details = JSONField()
     amount = CurrencyAmountField()
 
-    invoice_id = models.CharField(max_length=255)
-    custom_id  = models.CharField(max_length=127)
+    invoice_id = models.CharField(max_length=255, blank=True)
+    custom_id  = models.CharField(max_length=127, blank=True)
 
     seller_protection = JSONField()
     final_capture = models.BooleanField()
