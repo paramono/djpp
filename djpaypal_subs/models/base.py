@@ -97,7 +97,7 @@ class PaypalModel(models.Model):
 
         for k, v in list(obj_details.items()):
             if k not in field_names:
-                _extra_fields.update(k=v)
+                _extra_fields[k] = v
                 obj_details.pop(k)
         obj_details['_extra_fields'] = _extra_fields
         return obj_details
