@@ -17,7 +17,14 @@ class Payer(models.Model):
     )
     shipping_address = JSONField(null=True, blank=True, editable=False)
     time_created = models.DateTimeField(null=True, blank=True, editable=False)
-    apimode = models.CharField(choices=APIMODE_CHOICES, max_length=24)
+    livemode = models.BooleanField(
+        null=True,
+        default=None,
+        blank=True,
+        help_text='Null here indicates that the livemode status is unknown or was '
+        'previously unrecorded. Otherwise, this field indicates whether this record '
+        'comes from Stripe test mode or live mode operation.',
+    )
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 

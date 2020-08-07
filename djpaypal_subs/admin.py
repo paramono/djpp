@@ -7,7 +7,7 @@ from .settings import PAYPAL_SUBS_WEBHOOK_ID
 
 
 class BasePaypalModelAdmin(admin.ModelAdmin):
-    _common_fields = ("id", "date_created", "date_modified", "apimode", )
+    _common_fields = ("id", "date_created", "date_modified", "livemode", )
     # change_form_template = "djpaypal/admin/change_form.html"
 
     def get_fieldsets(self, request, obj=None):
@@ -22,7 +22,7 @@ class BasePaypalModelAdmin(admin.ModelAdmin):
         return ("__str__", ) + self.list_display + self._common_fields[1:]
 
     def get_list_filter(self, request):
-        return self.list_filter + ("apimode", )
+        return self.list_filter + ("livemode", )
 
     def get_readonly_fields(self, request, obj=None):
         return self.readonly_fields + self._common_fields
@@ -75,10 +75,10 @@ class BillingAgreementAdmin(BasePaypalModelAdmin):
 @admin.register(models.PreparedBillingAgreement)
 class PreparedBillingAgreementAdmin(admin.ModelAdmin):
     list_display = (
-        "__str__", "apimode", "user", "executed_agreement", "executed_at",
+        "__str__", "livemode", "user", "executed_agreement", "executed_at",
         "created", "updated"
     )
-    list_filter = ("apimode", "executed_at")
+    list_filter = ("livemode", "executed_at")
     readonly_fields = ("id", "created", "updated")
     raw_id_fields = ("user", "executed_agreement")
 
@@ -107,7 +107,7 @@ class DisputeAdmin(BasePaypalModelAdmin):
 @admin.register(models.Payer)
 class PayerAdmin(admin.ModelAdmin):
     list_display = (
-        "__str__", "first_name", "last_name", "email", "user", "apimode"
+        "__str__", "first_name", "last_name", "email", "user", "livemode"
     )
     search_fields = ("id", "first_name", "last_name", "email")
     raw_id_fields = ("user", )
@@ -175,34 +175,34 @@ class CheckoutOrderAdmin(BasePaypalModelAdmin):
 @admin.register(models.Product)
 class ProductAdmin(BasePaypalModelAdmin):
     list_display = (
-        'id', 'apimode', 'name', 'description', 'type', 'category',
+        'id', 'livemode', 'name', 'description', 'type', 'category',
         'create_time', 'update_time',
     )
-    list_filter = ('apimode', 'type', )
+    list_filter = ('livemode', 'type', )
 
 
 @admin.register(models.Plan)
 class PlanAdmin(BasePaypalModelAdmin):
     list_display = (
-        'id', 'apimode',
+        'id', 'livemode',
         'product',
         'name', 'description', 'status',
         'create_time', 'update_time',
     )
-    list_filter = ('apimode', 'status', )
+    list_filter = ('livemode', 'status', )
     raw_id_fields = ('product', )
 
 
 @admin.register(models.Subscription)
 class SubscriptionAdmin(BasePaypalModelAdmin):
     list_display = (
-        'id', 'apimode',
+        'id', 'livemode',
         'plan',
         'status', 'status_change_note', 'status_update_time',
         'start_time', 'quantity',
         'create_time', 'update_time',
     )
-    list_filter = ('apimode', 'status', )
+    list_filter = ('livemode', 'status', )
     raw_id_fields = ('plan', )
 
 

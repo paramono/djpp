@@ -5,7 +5,7 @@ from django.utils.decorators import classproperty
 
 from djpaypal_subs.api import PaypalApi
 from djpaypal_subs.constants import APIMODE_CHOICES
-from djpaypal_subs.settings import PAYPAL_SUBS_MODE
+from djpaypal_subs.settings import PAYPAL_SUBS_LIVEMODE
 
 
 class PaypalModel(models.Model):
@@ -19,7 +19,14 @@ class PaypalModel(models.Model):
     deferred_attrs = None  # ['product_id'], ['plan_id'], etc
 
     id = models.CharField(primary_key=True, db_index=True, max_length=50)
-    apimode = models.CharField(choices=APIMODE_CHOICES, max_length=24)
+    livemode = models.BooleanField(
+        null=True,
+        default=None,
+        blank=True,
+        help_text='Null here indicates that the livemode status is unknown or was '
+        'previously unrecorded. Otherwise, this field indicates whether this record '
+        'comes from Stripe test mode or live mode operation.',
+    )
 
     # These datetimes are synced from Paypal API
     create_time = models.DateTimeField(blank=True, null=True)
@@ -107,15 +114,31 @@ class PaypalModel(models.Model):
         cleaned_data = cls.sdk_object_as_dict(data)
 
         # Delete links (only useful in the API itself)
-        if "links" in cleaned_data:
-            del cleaned_data["links"]
+        # if "links" in cleaned_data:
+        #     del cleaned_data["links"]
 
         # Extract the ID to return it separately
         id = cleaned_data.pop(cls.id_field_name)
+        livemode = cls.extract_livemode(data)
 
-        # Set the apimode
-        cleaned_data["apimode"] = PAYPAL_SUBS_MODE
+        # Set the livemode; if failed to extract it from data,
+        # set the value from settings
+        cleaned_data["livemode"] = livemode or PAYPAL_SUBS_LIVEMODE
         return id, cleaned_data, {}
+
+    @classmethod
+    def extract_livemode(cls, data):
+        '''Tried to extract livemode from links'''
+        links = cleaned_data.get('links', [])
+        if not links:
+            return None
+
+        url = links[0].get('href', '')
+        if 'api.sandbox.paypal.com' in url:
+            return False
+        elif 'api.paypal.com' in url:
+            return True
+        return None
 
     @classmethod
     def get_or_update_from_api_data(cls, data, always_sync=False):
@@ -151,7 +174,7 @@ class PaypalModel(models.Model):
 
     @property
     def dashboard_url(self):
-        if self.apimode:
+        if self.livemode:
             paypal_url = "https://www.paypal.com"
         else:
             paypal_url = "https://www.sandbox.paypal.com"

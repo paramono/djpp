@@ -10,7 +10,7 @@ from paypalrestsdk import payments as paypal_models
 from .. import enums
 from ..exceptions import AgreementAlreadyExecuted, PaypalApiError
 from ..fields import CurrencyAmountField, JSONField
-from ..settings import PAYPAL_SUBS_MODE
+from ..settings import PAYPAL_SUBS_LIVEMODE
 from ..constants import APIMODE_CHOICES
 from .base import PaypalModel
 
@@ -118,8 +118,14 @@ class PreparedBillingAgreement(models.Model):
         max_length=128, primary_key=True, editable=False, serialize=True,
         help_text='Same as the BillingAgreement token'
     )
-    # apimode = models.BooleanField()
-    apimode = models.CharField(choices=APIMODE_CHOICES, max_length=24)
+    livemode = models.BooleanField(
+        null=True,
+        default=None,
+        blank=True,
+        help_text='Null here indicates that the livemode status is unknown or was '
+        'previously unrecorded. Otherwise, this field indicates whether this record '
+        'comes from Stripe test mode or live mode operation.',
+    )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     data = JSONField()
     executed_agreement = models.ForeignKey(
@@ -148,7 +154,7 @@ class PreparedBillingAgreement(models.Model):
     def create_from_data(cls, data, user):
         data = data.to_dict()
         return cls.objects.create(
-            id=cls._extract_token(data), apimode=PAYPAL_SUBS_MODE, user=user, data=data
+            id=cls._extract_token(data), livemode=PAYPAL_SUBS_LIVEMODE, user=user, data=data
         )
 
     def __str__(self):
@@ -256,7 +262,7 @@ class BillingAgreement(PaypalModel):
             payer_info = payer_info.copy()
             payer_id = payer_info.pop('payer_id')
             payer_info['user'] = self.user
-            payer_info['apimode'] = self.apimode
+            payer_info['livemode'] = self.livemode
             self.payer_model, created = Payer.objects.update_or_create(
                 id=payer_id, defaults=payer_info
             )

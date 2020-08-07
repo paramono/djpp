@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 
-APIMODE_SANDBOX = 'sandbox'
-APIMODE_LIVE = 'live'
+APIMODE_SANDBOX = False
+APIMODE_LIVE = True
 
 APIMODE_CHOICES = [
     (APIMODE_SANDBOX, _('Sandbox')),
