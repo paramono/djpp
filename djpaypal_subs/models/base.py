@@ -119,7 +119,7 @@ class PaypalModel(models.Model):
 
         # Extract the ID to return it separately
         id = cleaned_data.pop(cls.id_field_name)
-        livemode = cls.extract_livemode(data)
+        livemode = cls.extract_livemode(cleaned_data)
 
         # Set the livemode; if failed to extract it from data,
         # set the value from settings
