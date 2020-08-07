@@ -129,7 +129,7 @@ class PaypalModel(models.Model):
     @classmethod
     def extract_livemode(cls, data):
         '''Tried to extract livemode from links'''
-        links = cleaned_data.get('links', [])
+        links = data.get('links', [])
         if not links:
             return None
 
