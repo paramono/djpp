@@ -7,7 +7,7 @@ from .settings import PAYPAL_SUBS_WEBHOOK_ID
 
 
 class BasePaypalModelAdmin(admin.ModelAdmin):
-    _common_fields = ("id", "date_created", "date_modified", "livemode", )
+    _common_fields = ("id", "created", "updated", "livemode", )
     # change_form_template = "djpaypal/admin/change_form.html"
 
     def get_fieldsets(self, request, obj=None):
@@ -229,9 +229,9 @@ class WebhookEventAdmin(BasePaypalModelAdmin):
 @admin.register(models.WebhookEventTrigger)
 class WebhookEventTriggerAdmin(admin.ModelAdmin):
     list_display = (
-        "date_created", "date_modified", "valid", "processed", "exception", "webhook_event",
+        "created", "updated", "valid", "processed", "exception", "webhook_event",
     )
-    list_filter = ("date_created", "valid", "processed", )
+    list_filter = ("created", "valid", "processed", )
     raw_id_fields = ("webhook_event", )
 
     def reverify(self, request, queryset):

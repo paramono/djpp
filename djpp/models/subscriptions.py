@@ -1,8 +1,8 @@
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
-from djpaypal_subs.models.base import PaypalModel
-from djpaypal_subs.constants import (
+from .base import PaypalModel
+from ..constants import (
     PRODUCTS_ENDPOINT, PRODUCT_TYPES,
     PLANS_ENDPOINT, PLAN_STATUS_CHOICES,
     SUBSCRIPTIONS_ENDPOINT, SUBSCRIPTION_STATUS_CHOICES,

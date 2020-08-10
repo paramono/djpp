@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "djpaypal_subs"
-version = "0.3.3"
+name = "djpp"
+version = "0.3.4"
 description = ""
 authors = ["paramono <alex@paramono.com>"]
 
 packages = [
-    { include = "djpaypal_subs" }
+    { include = "djpp" }
 ]
 
 [tool.poetry.dependencies]

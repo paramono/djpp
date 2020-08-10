@@ -3,9 +3,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.decorators import classproperty
 
-from djpaypal_subs.api import PaypalApi
-from djpaypal_subs.constants import APIMODE_CHOICES
-from djpaypal_subs.settings import PAYPAL_SUBS_LIVEMODE
+from ..api import PaypalApi
+from ..settings import PAYPAL_SUBS_LIVEMODE
 
 
 class PaypalModel(models.Model):
@@ -35,8 +34,8 @@ class PaypalModel(models.Model):
     links = JSONField(default=list)
 
     # These datetimes are handled by django automatically
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     # Sometimes PayPal returns undocumented fields. These will be extracted
     # into this JSON field - useful if PayPal changes their response json

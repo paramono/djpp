@@ -25,8 +25,9 @@ class Payer(models.Model):
         'previously unrecorded. Otherwise, this field indicates whether this record '
         'comes from Stripe test mode or live mode operation.',
     )
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "{first_name} {last_name} <{email}>".format(

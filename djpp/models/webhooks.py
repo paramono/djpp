@@ -8,9 +8,9 @@ from django.dispatch import Signal
 from django.utils.functional import cached_property
 from paypalrestsdk import notifications as paypal_models
 
-from djpaypal_subs.settings import PAYPAL_SUBS_WEBHOOK_ID
-from djpaypal_subs.utils import fix_django_headers, get_version
-from djpaypal_subs.models.base import PaypalModel
+from ..settings import PAYPAL_SUBS_WEBHOOK_ID
+from ..utils import fix_django_headers, get_version
+from .base import PaypalModel
 
 # https://developer.paypal.com/docs/api-basics/notifications/webhooks/event-names/#
 WEBHOOK_EVENT_TYPES = {
@@ -259,8 +259,9 @@ class WebhookEventTrigger(models.Model):
         default=get_version,
         help_text="The version of dj-paypal when the webhook was received"
     )
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     @classmethod
     def from_request(cls, request, webhook_id=PAYPAL_SUBS_WEBHOOK_ID):

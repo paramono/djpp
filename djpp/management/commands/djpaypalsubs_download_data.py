@@ -1,5 +1,5 @@
 from django.core.management import BaseCommand
-from djpaypal_subs.models import Product, Plan
+from djpp.models import Product, Plan
 
 
 class Command(BaseCommand):
