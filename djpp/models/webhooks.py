@@ -146,7 +146,7 @@ WEBHOOK_EVENT_TYPES = {
 }
 
 WEBHOOK_SIGNALS = {
-    hook: Signal(providing_args=["event"]) for hook in WEBHOOK_EVENT_TYPES
+    hook: Signal(providing_args=['event', 'created']) for hook in WEBHOOK_EVENT_TYPES
 }
 
 
@@ -173,8 +173,8 @@ class WebhookEvent(PaypalModel):
     def process(cls, data):
         ret, created = cls.get_or_update_from_api_data(data)
         resource, resource_created = ret.create_or_update_resource()
-        if resource_created:
-            ret.send_signal()
+        # if resource_created:
+        ret.send_signal(created=resource_created)
         return ret
 
     @property
@@ -233,11 +233,11 @@ class WebhookEvent(PaypalModel):
         cls = self.resource_model
         return cls.objects.get(**{cls.id_field_name: self.resource_id})
 
-    def send_signal(self):
+    def send_signal(self, created=None):
         event_type = self.event_type.lower()
         signal = WEBHOOK_SIGNALS.get(event_type)
         if signal:
-            signal.send(sender=self.__class__, event=self)
+            signal.send(sender=self.__class__, event=self, created=created)
 
 
 class WebhookEventTrigger(models.Model):
