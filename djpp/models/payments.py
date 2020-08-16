@@ -30,6 +30,8 @@ class Payment(PaypalModel):
 
 
 class Refund(PaypalModel):
+    deferred_attrs = ['sale_id', 'parent_payment_id']
+
     amount = CurrencyAmountField(
         help_text=(
             'The refund amount. Includes both the amount refunded to the '

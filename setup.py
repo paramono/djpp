@@ -14,7 +14,7 @@ readme = ''
 setup(
     long_description=readme,
     name='djpp',
-    version='0.3.5',
+    version='0.3.6',
     python_requires='==3.*,>=3.5.0',
     author='paramono',
     author_email='alex@paramono.com',
