@@ -68,13 +68,14 @@ class PaypalModel(models.Model):
         for obj in obj_list:
             pk = obj.pop('id')
             if detailed:
-                # when you list_objucts, not all the fields will be returned by API,
+                # when you list_objects, not all the fields will be returned by API,
                 # so get the remaining fields one by one
                 obj_details = PaypalApi.get(cls.endpoint, pk)
                 obj_details.pop('id')
             else:
                 obj_details = obj
 
+            print(f'pk: {pk}')
             obj_details = cls.make_dict_with_defined_fields(obj_details)
             cls.objects.update_or_create(pk=pk, **obj_details)
 
@@ -93,6 +94,7 @@ class PaypalModel(models.Model):
         items = list(obj_details.items())
         for item in items:
             print(item)
+        print()
 
         for k, v in list(obj_details.items()):
             if k not in field_names:

@@ -184,7 +184,7 @@ class ProductAdmin(BasePaypalModelAdmin):
 @admin.register(models.Plan)
 class PlanAdmin(BasePaypalModelAdmin):
     list_display = (
-        'id', 'livemode',
+        'id',
         'product',
         'name', 'description', 'status',
         'create_time', 'update_time',

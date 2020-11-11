@@ -6,8 +6,8 @@ class Command(BaseCommand):
     help = 'Syncs all data from upstream Paypal'
 
     def handle(self, *args, **kwargs):
-        print('Downloading products')
+        print('# Downloading products\n')
         Product.init_from_api()
 
-        print('Downloading plans')
+        print('# Downloading plans\n')
         Plan.init_from_api()
