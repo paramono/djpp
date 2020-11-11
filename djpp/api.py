@@ -66,7 +66,7 @@ class PaypalApi(object):
         total_pages = 1
         page_lists = []
         while page <= total_pages:
-            r = requests.get(f'{url}?page={page}', headers=headers)
+            r = requests.get(f'{url}?page={page}&total_required=true', headers=headers)
             r.raise_for_status()
             dic = r.json()
             total_pages = dic.get('total_pages', 1)

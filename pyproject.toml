@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "djpp"
-version = "0.3.9"
+version = "0.3.10"
 description = ""
 authors = ["paramono <alex@paramono.com>"]
 
