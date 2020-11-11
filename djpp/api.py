@@ -61,9 +61,18 @@ class PaypalApi(object):
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % cls.token,
         }
-        r = requests.get(url, headers=headers)
-        r.raise_for_status()
-        return r.json()
+
+        page = 1
+        total_pages = 1
+        page_lists = []
+        while page <= total_pages:
+            r = requests.get(f'{url}?page={page}', headers=headers)
+            r.raise_for_status()
+            dic = r.json()
+            total_pages = dic.get('total_pages', 1)
+            page_lists.append(dic)
+            page += 1
+        return page_lists
 
     @classmethod
     def get(cls, endpoint, endpoint_id=None, mode='settings', **kwargs):

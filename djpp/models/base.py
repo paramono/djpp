@@ -60,24 +60,26 @@ class PaypalModel(models.Model):
 
     @classmethod
     def init_from_api(cls, mode='settings', detailed=True, **kwargs):
-        obj_json = PaypalApi.list(cls.endpoint, mode=mode)
-
+        page_lists = PaypalApi.list(cls.endpoint, mode=mode)
+        # obj_json = PaypalApi.list(cls.endpoint, mode=mode)
         plural = cls.__name__.lower() + 's'
-        obj_list = obj_json.get(plural, [])
 
-        for obj in obj_list:
-            pk = obj.pop('id')
-            if detailed:
-                # when you list_objects, not all the fields will be returned by API,
-                # so get the remaining fields one by one
-                obj_details = PaypalApi.get(cls.endpoint, pk)
-                obj_details.pop('id')
-            else:
-                obj_details = obj
+        for page_list in page_lists:
+            obj_list = page_list.get(plural, [])
 
-            print(f'pk: {pk}')
-            obj_details = cls.make_dict_with_defined_fields(obj_details)
-            cls.objects.update_or_create(pk=pk, **obj_details)
+            for obj in obj_list:
+                pk = obj.pop('id')
+                if detailed:
+                    # when you list_objects, not all the fields will be returned by API,
+                    # so get the remaining fields one by one
+                    obj_details = PaypalApi.get(cls.endpoint, pk)
+                    obj_details.pop('id')
+                else:
+                    obj_details = obj
+
+                print(f'pk: {pk}')
+                obj_details = cls.make_dict_with_defined_fields(obj_details)
+                cls.objects.update_or_create(pk=pk, **obj_details)
 
     @classmethod
     def make_dict_with_defined_fields(cls, obj_details):
@@ -91,10 +93,10 @@ class PaypalModel(models.Model):
         _extra_fields = {}
         field_names = cls.field_names
 
-        items = list(obj_details.items())
-        for item in items:
-            print(item)
-        print()
+        # items = list(obj_details.items())
+        # for item in items:
+        #     print(item)
+        # print()
 
         for k, v in list(obj_details.items()):
             if k not in field_names:
