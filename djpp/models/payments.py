@@ -156,15 +156,18 @@ class Sale(PaypalModel):
 
     @classmethod
     def clean_api_data(cls, data):
-        from .billing import BillingAgreement
 
         id, cleaned_data, m2ms = super().clean_api_data(data)
 
-        if 'billing_agreement_id' in cleaned_data:
-            ba_id = cleaned_data['billing_agreement_id']
-            # Ensure that the billing agreement exists in the db
-            # If it exists, it will be updated with new data
-            BillingAgreement.find_and_sync(ba_id)
+        # Billing agreements endpoint has been recently deprecated
+        # https://developer.paypal.com/docs/api/payments.billing-agreements/v1/
+
+        # from .billing import BillingAgreement
+        # if 'billing_agreement_id' in cleaned_data:
+        #     ba_id = cleaned_data['billing_agreement_id']
+        #     # Ensure that the billing agreement exists in the db
+        #     # If it exists, it will be updated with new data
+        #     BillingAgreement.find_and_sync(ba_id)
 
         # Ensure the parent payment exists in the db
         if 'parent_payment' in cleaned_data:
